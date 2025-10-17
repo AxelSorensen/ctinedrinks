@@ -1,103 +1,237 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { Inter } from "next/font/google";
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+});
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [scrollY, setScrollY] = useState(0);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Calculate opacity based on scroll position
+  const firstImageOpacity = Math.max(0, 1 - scrollY / 300);
+  const secondImageOpacity = Math.max(
+    0,
+    Math.min(1, scrollY / 300, 1 - (scrollY - 400) / 300)
+  );
+  const thirdImageOpacity = Math.max(0, Math.min(1, (scrollY - 400) / 300));
+
+  // Define sections - easy to add/remove/modify
+  const sections = [
+    {
+      id: "hero",
+      title: "",
+      subtitle: "",
+      buttonText: null,
+      showLogo: true,
+      image: null,
+      height: "h-screen",
+    },
+    {
+      id: "about",
+      title: "Premium Quality Drinks",
+      subtitle:
+        "C-Tine's infusion cap keeps 5 grams of 100% creatine monohydrate sealed in its purest state — until the moment you activate it.\n\nCreatine as you know it - 5g of pure, 100% monohydrate.\n\nRefreshing elderflower zero sugar, no dry scoops, no bad taste, best served cold.\n\nCrafted from premium PET or rPET, Pharma Veral bottles are BPA, BPS, and BPF free, offering food-grade safety, strong chemical resistance, and reliable durability.",
+      buttonText: null,
+      showLogo: false,
+      image: "/assets/ctine-shot.png",
+      height: "min-h-screen",
+    },
+    {
+      id: "sustainability",
+      title: "Everyday Convenience",
+      subtitle:
+        "Every thought, lift, and movement runs on one thing - energy.\n\nCreatine is your body's natural power reserve, recycling ATP, the fuel for your muscles and brain.\n\nWhen ATP drops, fatigue hits - but with higher creatine levels, performance lasts longer.\n\nSharper focus. Stronger lifts. Faster recovery.\n\nNot just in the gym, but in everyday life.\n\nEach shot delivers 5 grams of pure creatine, infused with elderflower for instant activation.\n\nNo powders. No measuring. No mess. Just twist, press and go.",
+      buttonText: null,
+      showLogo: false,
+      image: "/assets/Adenosintriphosphat_protoniert.svg.png",
+      height: "min-h-screen",
+    },
+    {
+      id: "join",
+      title: "Join the Revolution",
+      subtitle: "Be part of the next generation of beverage innovation",
+      buttonText: "Get Started",
+      showLogo: false,
+      image: null,
+      height: "min-h-screen",
+    },
+  ];
+
+  return (
+    <div className={`relative ${inter.className}`}>
+      {/* Fixed Background Images */}
+      <div className="fixed inset-0 z-0">
+        {/* First Image */}
+        <div
+          className="absolute inset-0 transition-opacity duration-300"
+          style={{ opacity: firstImageOpacity }}
+        >
+          <Image
+            src="/assets/img_1.jpg"
+            alt="First fullscreen background"
+            fill
+            className="object-cover object-[center_10%]"
+            priority
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+        {/* Second Image */}
+        <div
+          className="absolute inset-0 transition-opacity duration-300"
+          style={{ opacity: secondImageOpacity }}
         >
           <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+            src="/assets/img_2.png"
+            alt="Second fullscreen background"
+            fill
+            className="object-cover scale-110 -scale-x-100 object-center"
+            priority
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        </div>
+
+        {/* Third Image */}
+        <div
+          className="absolute inset-0 transition-opacity duration-300"
+          style={{ opacity: thirdImageOpacity }}
         >
           <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+            src="/assets/img_2.png"
+            alt="Third fullscreen background"
+            fill
+            className="object-cover scale-125 object-[center_20%]"
+            priority
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        </div>
+      </div>
+
+      {/* Scrollable Content */}
+      <div className="relative z-10">
+        {sections.map((section, index) => (
+          <div
+            key={section.id}
+            className={`${section.height} flex items-center justify-center`}
+          >
+            {section.image ? (
+              // Two-column layout for sections with images
+              <div className="flex flex-col md:flex-row items-center md:justify-between w-full max-w-6xl px-8">
+                <div className="text-center md:text-left text-white max-w-2xl md:mr-8 mb-8 md:mb-0">
+                  {section.title && (
+                    <h1 className="text-3xl md:text-5xl font-light mb-4 drop-shadow-lg">
+                      {section.title}
+                    </h1>
+                  )}
+                  {section.subtitle && (
+                    <div className="text-lg md:text-xl mb-6 drop-shadow-md font-light whitespace-pre-line">
+                      {section.subtitle}
+                    </div>
+                  )}
+                  {section.buttonText && (
+                    <button className="bg-white text-black px-6 py-3 rounded-full text-base font-light hover:bg-gray-200 transition-colors drop-shadow-lg">
+                      {section.buttonText}
+                    </button>
+                  )}
+                </div>
+                <div className="flex-shrink-0">
+                  <img
+                    src={section.image}
+                    alt={
+                      section.id === "sustainability"
+                        ? "ATP Molecule"
+                        : "CTINE Bottle"
+                    }
+                    className={`object-contain drop-shadow-lg w-full max-w-lg md:max-w-sm ${
+                      section.id === "sustainability"
+                        ? "filter brightness-0 invert"
+                        : ""
+                    }`}
+                  />
+                </div>
+              </div>
+            ) : (
+              // Single column layout for sections without images
+              <div className="text-center text-white max-w-4xl px-8">
+                {section.showLogo && (
+                  <div className="mb-8">
+                    <img
+                      src="/ctine-logo.svg"
+                      alt="CTINE Logo"
+                      className="w-[300px] mx-auto mb-8"
+                    />
+                    {/* Scroll CTA */}
+                    <div className="flex flex-col items-center text-white/70">
+                      <span className="text-sm font-light mb-2">
+                        Scroll to explore
+                      </span>
+                      <div className="scroll-cta">
+                        <svg
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="opacity-70"
+                        >
+                          <path
+                            d="M12 5V19M5 12L12 19L19 12"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {section.title && (
+                  <h1
+                    className={`font-light mb-4 drop-shadow-lg ${
+                      section.showLogo
+                        ? "text-5xl md:text-7xl mb-6"
+                        : "text-3xl md:text-5xl"
+                    }`}
+                  >
+                    {section.title}
+                  </h1>
+                )}
+                {section.subtitle && (
+                  <p
+                    className={`drop-shadow-md font-light ${
+                      section.showLogo
+                        ? "text-xl md:text-3xl mb-8"
+                        : "text-lg md:text-xl mb-6"
+                    }`}
+                  >
+                    {section.subtitle}
+                  </p>
+                )}
+                {section.buttonText && (
+                  <button
+                    className={`bg-white text-black rounded-full font-light hover:bg-gray-200 transition-colors drop-shadow-lg ${
+                      section.showLogo
+                        ? "px-8 py-4 text-lg"
+                        : "px-6 py-3 text-base"
+                    }`}
+                  >
+                    {section.buttonText}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
