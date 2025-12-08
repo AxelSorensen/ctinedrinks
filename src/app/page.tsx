@@ -58,7 +58,7 @@ export default function Home() {
       buttonText: translations[lang].hero.buttonText,
       showLogo: true,
       image: null,
-      height: "h-screen",
+      height: "h-dvh",
     },
     {
       id: "about",
@@ -104,7 +104,7 @@ export default function Home() {
       buttonText: translations[lang].join.buttonText,
       showLogo: false,
       image: null,
-      height: "h-screen",
+      height: "h-dvh",
     },
   ];
 
@@ -217,25 +217,40 @@ export default function Home() {
                             <div className="grid mt-8 grid-cols-1 sm:grid-cols-3 w-full items-start justify-center gap-8 mb-8">
                               <div className="flex flex-col w-full">
                                 <div className="text-left text-white text-sm font-semibold leading-tight mb-1">
-                                  {translations[lang].about.features.creatine.title}
+                                  {
+                                    translations[lang].about.features.creatine
+                                      .title
+                                  }
                                 </div>
                                 <div className="border-t border-white w-full mb-2" />
                                 <div className="text-left text-white text-xs font-normal">
-                                  {translations[lang].about.features.creatine.desc}
+                                  {
+                                    translations[lang].about.features.creatine
+                                      .desc
+                                  }
                                 </div>
                               </div>
                               <div className="flex flex-col w-full">
                                 <div className="text-left text-white text-sm font-semibold leading-tight mb-1 lg:whitespace-nowrap">
-                                  {translations[lang].about.features.electrolytes.title}
+                                  {
+                                    translations[lang].about.features
+                                      .electrolytes.title
+                                  }
                                 </div>
                                 <div className="border-t border-white w-full mb-2" />
                                 <div className="text-left text-white text-xs font-normal">
-                                  {translations[lang].about.features.electrolytes.desc}
+                                  {
+                                    translations[lang].about.features
+                                      .electrolytes.desc
+                                  }
                                 </div>
                               </div>
                               <div className="flex flex-col w-full">
                                 <div className="text-left text-white text-sm font-semibold leading-tight mb-1">
-                                  {translations[lang].about.features.sugar.title}
+                                  {
+                                    translations[lang].about.features.sugar
+                                      .title
+                                  }
                                 </div>
                                 <div className="border-t border-white w-full mb-2" />
                                 <div className="text-left text-white text-xs font-normal">
