@@ -103,7 +103,7 @@ function RootLayoutInner({
   return (
     <html lang={lang}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
       >
         <Header />
         <div className="px-4" style={{ paddingTop: "72px" }}>
