@@ -111,7 +111,7 @@ export default function Home() {
   return (
     <div className={`relative ${inter.className}`}>
       {/* Fixed Background Images */}
-      <div className="fixed inset-0 z-0" style={{ height: '100dvh' }}>
+      <div className="fixed inset-0 z-0" style={{ height: "100dvh" }}>
         {sections.map((section, idx) => {
           // Last slide gets black background only
           if (idx === sections.length - 1) {
