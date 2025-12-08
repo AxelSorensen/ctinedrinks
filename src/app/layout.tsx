@@ -51,7 +51,7 @@ function Header() {
       </Link>
       <div className="flex items-center gap-4">
         <button
-          onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}
+          onClick={() => setLang(lang === "en" ? "ar" : "en")}
           className="cursor-pointer"
           style={{
             color: scrolled ? "#fff" : "#111",
@@ -64,7 +64,7 @@ function Header() {
             fontSize: "0.85rem",
           }}
         >
-          {lang === 'en' ? 'العربية' : 'English'}
+          {lang === "en" ? "العربية" : "English"}
         </button>
         <button
           type="button"
