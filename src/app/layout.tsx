@@ -37,9 +37,9 @@ function Header() {
         left: 0,
         zIndex: 9999,
         padding: "1rem",
-        backdropFilter: "blur(12px)",
+        backdropFilter: `blur(${scrolled ? 12 : 0}px)`,
         WebkitBackdropFilter: "blur(12px)",
-        borderBottom: "1px solid rgba(255,255,255,0.08)",
+        borderBottom: `1px solid rgba(255,255,255,${scrolled ? 0.2 : 0})`,
       }}
     >
       <Link href="/">

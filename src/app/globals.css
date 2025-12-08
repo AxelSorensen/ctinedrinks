@@ -119,3 +119,17 @@ body {
     transform: translate(-5%, -10%);
   }
 }
+
+.header-overlay::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: var(--blur-opacity);
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
