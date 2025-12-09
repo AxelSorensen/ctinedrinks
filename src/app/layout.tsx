@@ -30,7 +30,7 @@ function Header() {
 
   return (
     <div
-      className="w-full absolute flex items-center justify-between"
+      className="w-full font-bold sm:font-medium absolute flex items-center justify-between"
       style={{
         position: "fixed",
         top: 0,
@@ -59,7 +59,7 @@ function Header() {
             border: "none",
             borderRadius: "6px",
             padding: "0.5rem 1.25rem",
-            fontWeight: 500,
+
             textDecoration: "none",
             fontSize: "0.85rem",
           }}
@@ -81,7 +81,6 @@ function Header() {
             border: "none",
             borderRadius: "6px",
             padding: "0.5rem 1.25rem",
-            fontWeight: 500,
             textDecoration: "none",
             fontSize: "0.85rem",
           }}
