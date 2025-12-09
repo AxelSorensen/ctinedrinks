@@ -58,7 +58,7 @@ export default function Home() {
       buttonText: translations[lang].hero.buttonText,
       showLogo: true,
       image: null,
-      height: "h-lvh",
+      height: "h-dvh",
     },
     {
       id: "about",
@@ -104,7 +104,7 @@ export default function Home() {
       buttonText: translations[lang].join.buttonText,
       showLogo: false,
       image: null,
-      height: "h-lvh",
+      height: "h-dvh",
     },
   ];
 
