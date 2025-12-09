@@ -27,6 +27,10 @@ export default function Home() {
   const { lang } = useLang();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       setScrollY(currentScrollY);
@@ -45,7 +49,7 @@ export default function Home() {
   const currentSection = Math.floor(scrollY / vh);
   const progressInSection = (scrollY % vh) / vh;
 
-  const overlayOpacity = Math.min(0.6, scrollY / 500);
+  const overlayOpacity = Math.min(0.9, scrollY / 500);
   const scrollIndicatorOpacity = Math.max(0, 1 - scrollY / 100);
 
   // Define sections - easy to add/remove/modify
