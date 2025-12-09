@@ -58,7 +58,7 @@ export default function Home() {
       buttonText: translations[lang].hero.buttonText,
       showLogo: true,
       image: null,
-      height: "h-dvh",
+      height: "h-lvh",
     },
     {
       id: "about",
@@ -104,14 +104,14 @@ export default function Home() {
       buttonText: translations[lang].join.buttonText,
       showLogo: false,
       image: null,
-      height: "h-dvh",
+      height: "h-lvh",
     },
   ];
 
   return (
     <div className={`relative ${inter.className}`}>
       {/* Fixed Background Images */}
-      <div className="fixed inset-0 z-0" style={{ height: "100dvh" }}>
+      <div className="fixed inset-0 z-0" style={{ height: "100lvh" }}>
         {sections.map((section, idx) => {
           // Last slide gets black background only
           if (idx === sections.length - 1) {
