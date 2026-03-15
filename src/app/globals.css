@@ -23,6 +23,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Inter;
+  overflow-x: hidden;
 }
 
 .animate-in {
@@ -73,6 +74,10 @@ body {
   position: relative;
 }
 
+.film-grain {
+  overflow: hidden;
+}
+
 .film-grain::after {
   content: "";
   background-image: url("https://upload.wikimedia.org/wikipedia/commons/7/76/1k_Dissolve_Noise_Texture.png");
@@ -84,6 +89,7 @@ body {
   opacity: var(--grain-opacity, 0.08);
   animation: animateGrain 8s steps(10) infinite;
   z-index: 1;
+  pointer-events: none;
 }
 
 @keyframes animateGrain {

@@ -4,6 +4,7 @@ import "./globals.css";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { LangProvider, useLang } from "../context/LangContext";
+import { ModalProvider, useModal } from "../context/ModalContext";
 import { translations } from "../lib/translations";
 
 const geistSans = Geist({
@@ -18,15 +19,63 @@ const geistMono = Geist_Mono({
 
 function Header() {
   const { lang, setLang } = useLang();
+  const { isModalOpen, setIsModalOpen, showEmailModal, setShowEmailModal } =
+    useModal();
   const [scrolled, setScrolled] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const [showWaitlistButton, setShowWaitlistButton] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 40);
+      const currentScrollY = window.scrollY;
+      setScrollY(currentScrollY);
+      setScrolled(currentScrollY > 40);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Calculate blur amount based on scroll position (max 12px)
+  const blurAmount = Math.min(scrollY / 10, 12);
+
+  // Interpolate color from dark (#111) to light (#fff) based on scroll
+  const interpolateColor = (
+    startColor: string,
+    endColor: string,
+    factor: number,
+  ) => {
+    const start = parseInt(startColor.slice(1), 16);
+    const end = parseInt(endColor.slice(1), 16);
+
+    const r1 = (start >> 16) & 0xff;
+    const g1 = (start >> 8) & 0xff;
+    const b1 = start & 0xff;
+
+    const r2 = (end >> 16) & 0xff;
+    const g2 = (end >> 8) & 0xff;
+    const b2 = end & 0xff;
+
+    const r = Math.round(r1 + (r2 - r1) * factor);
+    const g = Math.round(g1 + (g2 - g1) * factor);
+    const b = Math.round(b1 + (b2 - b1) * factor);
+
+    return `rgb(${r}, ${g}, ${b})`;
+  };
+
+  const buttonColor = interpolateColor(
+    "#111",
+    "#e5e5e5",
+    Math.min(scrollY / 100, 1),
+  );
+
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      setShowWaitlistButton(!document.cookie.includes("ctinewaitlist=true"));
+    }
+  }, []);
+
+  const vh = 800;
+  const joinPassed = scrollY > 0.2 * vh;
 
   return (
     <div
@@ -37,8 +86,8 @@ function Header() {
         left: 0,
         zIndex: 9999,
         padding: "1rem",
-        backdropFilter: `blur(${scrolled ? 12 : 0}px)`,
-        WebkitBackdropFilter: "blur(12px)",
+        backdropFilter: `blur(${blurAmount}px)`,
+        WebkitBackdropFilter: `blur(${blurAmount}px)`,
       }}
     >
       <Link href="/">
@@ -53,7 +102,7 @@ function Header() {
           onClick={() => setLang(lang === "en" ? "ar" : "en")}
           className="cursor-pointer"
           style={{
-            color: scrolled ? "#fff" : "#111",
+            color: buttonColor,
             background: "transparent",
             border: "none",
             borderRadius: "6px",
@@ -75,7 +124,7 @@ function Header() {
           }}
           className="cursor-pointer"
           style={{
-            color: scrolled ? "#fff" : "#111",
+            color: buttonColor,
             background: "transparent",
             border: "none",
             borderRadius: "6px",
@@ -86,6 +135,23 @@ function Header() {
         >
           {translations[lang].contact}
         </button>
+        {showWaitlistButton && (
+          <button
+            onClick={() => setShowEmailModal(true)}
+            className={`px-4 py-2 rounded-full text-sm  whitespace-nowrap cursor-pointer transition-all duration-200 ${
+              joinPassed
+                ? "bg-white text-black hover:bg-gray-200"
+                : "bg-transparent text-black hover:bg-black/20"
+            }`}
+          >
+            <span className="block md:hidden">
+              {translations[lang].joinWaitlistShort}
+            </span>
+            <span className="hidden md:block">
+              {translations[lang].joinWaitlist}
+            </span>
+          </button>
+        )}
       </div>
     </div>
   );
@@ -99,16 +165,18 @@ function RootLayoutInner({
   const { lang } = useLang();
 
   return (
-    <html lang={lang}>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
-      >
-        <Header />
-        <div className="px-4" style={{ paddingTop: "72px" }}>
-          {children}
-        </div>
-      </body>
-    </html>
+    <ModalProvider>
+      <html lang={lang}>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
+        >
+          <Header />
+          <div className="px-4" style={{ paddingTop: "72px" }}>
+            {children}
+          </div>
+        </body>
+      </html>
+    </ModalProvider>
   );
 }
 
@@ -119,7 +187,9 @@ export default function RootLayout({
 }>) {
   return (
     <LangProvider>
-      <RootLayoutInner>{children}</RootLayoutInner>
+      <ModalProvider>
+        <RootLayoutInner>{children}</RootLayoutInner>
+      </ModalProvider>
     </LangProvider>
   );
 }
