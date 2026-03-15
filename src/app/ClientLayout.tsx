@@ -150,7 +150,7 @@ function Header() {
               color: joinPassed ? "black" : "black",
               background: joinPassed ? "white" : "transparent",
               border: "none",
-              borderRadius: joinPassed ? "9999px" : "6px",
+              borderRadius: "9999px",
               padding: "0.5rem 1.25rem",
               textDecoration: "none",
               fontSize: "0.85rem",

@@ -59,7 +59,7 @@ export const translations = {
     haveQuestions: "Have questions?",
     modalTitle: "Welcome to the club",
     modalMessage:
-      "You've successfully joined our waitlist. We'll be in touch soon.",
+      "You're in! Get ready for the revolution in sports nutrition.",
     modalClose: "Close",
     emailModalTitle: "Join the waitlist",
     emailModalDescription: "Enter your email to join the waitlist",
@@ -126,7 +126,7 @@ export const translations = {
     orGetInTouch: "أو تواصل معنا:",
     haveQuestions: "لديك أسئلة؟",
     modalTitle: "مرحباً بك في النادي",
-    modalMessage: "لقد انضممت بنجاح إلى قائمة انتظارنا. سنتواصل معك قريباً.",
+    modalMessage: "أنت داخل! استعد للثورة في تغذية الرياضة.",
     modalClose: "إغلاق",
     emailModalTitle: "انضم إلى قائمة الانتظار",
     emailModalDescription: "أدخل بريدك الإلكتروني للانضمام إلى قائمة الانتظار",
