@@ -97,14 +97,14 @@ function Header() {
         WebkitBackdropFilter: `blur(${blurAmount}px)`,
       }}
     >
-      <Link href="/">
+      <Link href="/" style={{ flexShrink: 0 }}>
         <img
           src="/assets/ctine-logo.svg"
           alt="ctine logo"
-          style={{ height: "20px", width: "auto" }}
+          style={{ height: "20px", width: "auto", minHeight: "20px" }}
         />
       </Link>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center md:gap-4">
         <button
           onClick={() => setLang(lang === "en" ? "ar" : "en")}
           className="cursor-pointer"
@@ -145,11 +145,29 @@ function Header() {
         {showWaitlistButton && (
           <button
             onClick={() => setShowEmailModal(true)}
-            className={`px-4 py-2 rounded-full text-sm  whitespace-nowrap cursor-pointer transition-all duration-200 ${
-              joinPassed
-                ? "bg-white text-black hover:bg-gray-200"
-                : "bg-transparent text-black hover:bg-black/20"
-            }`}
+            className="cursor-pointer"
+            style={{
+              color: joinPassed ? "black" : "black",
+              background: joinPassed ? "white" : "transparent",
+              border: "none",
+              borderRadius: joinPassed ? "9999px" : "6px",
+              padding: "0.5rem 1.25rem",
+              textDecoration: "none",
+              fontSize: "0.85rem",
+              transition: "all 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              if (joinPassed) {
+                e.currentTarget.style.background = "#e5e5e5";
+              } else {
+                e.currentTarget.style.background = "rgba(0,0,0,0.1)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = joinPassed
+                ? "white"
+                : "transparent";
+            }}
           >
             <span className="block md:hidden">
               {translations[lang].joinWaitlistShort}

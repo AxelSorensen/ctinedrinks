@@ -4,13 +4,11 @@ import { ModalProvider } from "../context/ModalContext";
 import ClientLayout from "./ClientLayout";
 
 export const metadata: Metadata = {
-  title: "Ctine Drinks - Premium Beverages",
-  description:
-    "Discover Ctine Drinks, your source for premium and refreshing beverages. Join our waitlist for exclusive access.",
+  title: "Ctine Drinks - Make Consistency Possible",
+  description: "Welcome to C-Tine. Funcional drinks at a new pace.",
   openGraph: {
     title: "Ctine Drinks - Make Consistency Possible",
-    description:
-      "Discover Ctine Drinks, your source for premium and refreshing beverages. Join our waitlist for exclusive access.",
+    description: "Welcome to C-Tine. Funcional drinks at a new pace.",
     url: "https://ctinedrinks.com",
     siteName: "Ctine Drinks",
     images: [
@@ -26,9 +24,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ctine Drinks - Premium Beverages",
-    description:
-      "Discover Ctine Drinks, your source for premium and refreshing beverages. Join our waitlist for exclusive access.",
+    title: "Ctine Drinks - Make Consistency Possible",
+    description: "Welcome to C-Tine. Funcional drinks at a new pace.",
     images: ["/assets/ctine-og-image.png"],
   },
 };
