@@ -47,8 +47,14 @@ export default function Home() {
   const [isJoining, setIsJoining] = useState(false);
   const [email, setEmail] = useState("");
   const { lang } = useLang();
-  const { isModalOpen, setIsModalOpen, showEmailModal, setShowEmailModal, hasJoined, setHasJoined } =
-    useModal();
+  const {
+    isModalOpen,
+    setIsModalOpen,
+    showEmailModal,
+    setShowEmailModal,
+    hasJoined,
+    setHasJoined,
+  } = useModal();
 
   useEffect(() => {
     if (
@@ -62,21 +68,21 @@ export default function Home() {
 
   const getButtonPosition = (): "top" | "bottom" => {
     if (typeof window === "undefined") return "bottom";
-    
+
     const scrollY = window.scrollY;
     const windowHeight = window.innerHeight;
     const documentHeight = document.body.scrollHeight;
-    
+
     // If scrolled to the very top (within 100px)
     if (scrollY < 100) {
       return "top";
     }
-    
+
     // If scrolled to the very bottom (within 100px of bottom)
     if (scrollY + windowHeight > documentHeight - 100) {
       return "bottom";
     }
-    
+
     // Default to bottom if in middle
     return "bottom";
   };

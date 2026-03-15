@@ -20,7 +20,14 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <ModalContext.Provider
-      value={{ isModalOpen, setIsModalOpen, showEmailModal, setShowEmailModal, hasJoined, setHasJoined }}
+      value={{
+        isModalOpen,
+        setIsModalOpen,
+        showEmailModal,
+        setShowEmailModal,
+        hasJoined,
+        setHasJoined,
+      }}
     >
       {children}
     </ModalContext.Provider>

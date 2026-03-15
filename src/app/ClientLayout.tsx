@@ -19,8 +19,13 @@ const geistMono = Geist_Mono({
 
 function Header() {
   const { lang, setLang } = useLang();
-  const { isModalOpen, setIsModalOpen, showEmailModal, setShowEmailModal, hasJoined } =
-    useModal();
+  const {
+    isModalOpen,
+    setIsModalOpen,
+    showEmailModal,
+    setShowEmailModal,
+    hasJoined,
+  } = useModal();
   const [scrolled, setScrolled] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [showWaitlistButton, setShowWaitlistButton] = useState(false);
@@ -70,7 +75,9 @@ function Header() {
 
   useEffect(() => {
     if (typeof document !== "undefined") {
-      setShowWaitlistButton(!document.cookie.includes("ctinewaitlist=true") && !hasJoined);
+      setShowWaitlistButton(
+        !document.cookie.includes("ctinewaitlist=true") && !hasJoined,
+      );
     }
   }, [hasJoined]);
 
