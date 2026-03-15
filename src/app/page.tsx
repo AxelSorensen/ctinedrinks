@@ -47,7 +47,7 @@ export default function Home() {
   const [isJoining, setIsJoining] = useState(false);
   const [email, setEmail] = useState("");
   const { lang } = useLang();
-  const { isModalOpen, setIsModalOpen, showEmailModal, setShowEmailModal } =
+  const { isModalOpen, setIsModalOpen, showEmailModal, setShowEmailModal, hasJoined, setHasJoined } =
     useModal();
 
   useEffect(() => {
@@ -56,13 +56,32 @@ export default function Home() {
       document.cookie.includes("ctinewaitlist=true")
     ) {
       setAlreadyJoined(true);
+      setHasJoined(true);
     }
   }, []);
 
-  const handleJoinSubmit = async (
-    e: React.FormEvent,
-    buttonPosition: "top" | "bottom",
-  ) => {
+  const getButtonPosition = (): "top" | "bottom" => {
+    if (typeof window === "undefined") return "bottom";
+    
+    const scrollY = window.scrollY;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.body.scrollHeight;
+    
+    // If scrolled to the very top (within 100px)
+    if (scrollY < 100) {
+      return "top";
+    }
+    
+    // If scrolled to the very bottom (within 100px of bottom)
+    if (scrollY + windowHeight > documentHeight - 100) {
+      return "bottom";
+    }
+    
+    // Default to bottom if in middle
+    return "bottom";
+  };
+
+  const handleJoinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const sanitizedEmail = sanitizeEmail(email);
@@ -72,8 +91,9 @@ export default function Home() {
       return;
     }
 
+    const position = getButtonPosition();
     setIsJoining(true);
-    const success = await addEmailToWaitlist(sanitizedEmail, buttonPosition);
+    const success = await addEmailToWaitlist(sanitizedEmail, position);
     setIsJoining(false);
 
     if (success) {
@@ -83,6 +103,7 @@ export default function Home() {
       setIsModalOpen(true);
       document.cookie = "ctinewaitlist=true; path=/; max-age=31536000";
       setAlreadyJoined(true);
+      setHasJoined(true);
     }
   };
 
@@ -129,11 +150,6 @@ export default function Home() {
 
     return true;
   };
-
-  const handleTopButtonSubmit = (e: React.FormEvent) =>
-    handleJoinSubmit(e, "top");
-  const handleBottomButtonSubmit = (e: React.FormEvent) =>
-    handleJoinSubmit(e, "bottom");
 
   const sanitizeEmail = (email: string): string => {
     // Trim whitespace and convert to lowercase
@@ -846,7 +862,7 @@ export default function Home() {
                 <p className="text-gray-400 font-light mb-8">
                   {translations[lang].emailModalDescription}
                 </p>
-                <form onSubmit={handleTopButtonSubmit} className="w-full">
+                <form onSubmit={handleJoinSubmit} className="w-full">
                   <input
                     type="email"
                     value={email}
@@ -862,8 +878,30 @@ export default function Home() {
                   <button
                     type="submit"
                     disabled={isJoining}
-                    className="bg-white text-black font-medium px-8 py-3 rounded-lg hover:bg-gray-200 transition-colors w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-white text-black font-medium px-8 py-3 rounded-lg hover:bg-gray-200 transition-colors w-full disabled:opacity-50 flex items-center justify-center gap-2"
                   >
+                    {isJoining && (
+                      <svg
+                        className="animate-spin h-4 w-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                    )}
                     {isJoining
                       ? translations[lang].joiningText
                       : translations[lang].joinWaitlist}

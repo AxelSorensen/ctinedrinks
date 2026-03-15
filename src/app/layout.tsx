@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description:
     "Discover Ctine Drinks, your source for premium and refreshing beverages. Join our waitlist for exclusive access.",
   openGraph: {
-    title: "Ctine Drinks - Premium Beverages",
+    title: "Ctine Drinks - Make Consistency Possible",
     description:
       "Discover Ctine Drinks, your source for premium and refreshing beverages. Join our waitlist for exclusive access.",
     url: "https://ctinedrinks.com",
