@@ -198,7 +198,7 @@ export default function Home() {
       buttonText: translations[lang].hero.buttonText,
       showLogo: true,
       image: null,
-      height: "h-dvh",
+      height: "h-svh",
     },
     {
       id: "about",
@@ -244,7 +244,7 @@ export default function Home() {
       buttonText: translations[lang].join.buttonText,
       showLogo: false,
       image: null,
-      height: "h-dvh",
+      height: "h-svh",
     },
   ];
 
@@ -292,7 +292,7 @@ export default function Home() {
         dir={lang === "ar" ? "rtl" : "ltr"}
       >
         {/* Fixed Background Images */}
-        <div className="fixed inset-0 z-0" style={{ height: "100lvh" }}>
+        <div className="fixed inset-0 z-0 h-screen">
           {sections.map((section, idx) => {
             // Last slide gets black background only
             if (idx === sections.length - 1) {
@@ -355,8 +355,8 @@ export default function Home() {
             <div
               key={section.id}
               className={`${section.height} flex items-center justify-center ${
-                section.id === "hero" ? "hero" : ""
-              } py-36`}
+                section.id === "hero" ? "hero h-screen py-36" : "py-36"
+              }`}
             >
               {section.image ? (
                 // Two-column layout for sections with images
@@ -640,7 +640,7 @@ export default function Home() {
                           </button>
                         )}
 
-                        <div className="flex flex-col items-center pt-6 px-10 border-t border-white/10 w-full max-w-sm">
+                        <div className="flex flex-col items-center pt-16 px-10 border-t border-white/10 w-full max-w-sm">
                           <p className="text-white/50 text-sm mb-4">
                             {translations[lang].haveQuestions}
                           </p>
