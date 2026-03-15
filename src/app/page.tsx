@@ -725,11 +725,11 @@ export default function Home() {
         {/* Waitlist Modal */}
         {isModalOpen && (
           <div
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm p-4"
             onClick={() => setIsModalOpen(false)}
           >
             <div
-              className="bg-gray-900 border border-gray-800 rounded-2xl p-8 max-w-md w-full shadow-2xl relative film-grain"
+              className="bg-black border border-gray-600 rounded-2xl p-8 max-w-md w-full shadow-2xl relative film-grain"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -789,11 +789,11 @@ export default function Home() {
         {/* Email Input Modal */}
         {showEmailModal && (
           <div
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm p-4"
             onClick={() => setShowEmailModal(false)}
           >
             <div
-              className="bg-gray-900 border border-gray-800 rounded-2xl p-8 max-w-md w-full shadow-2xl relative film-grain"
+              className="bg-black border border-gray-600 rounded-2xl p-8 max-w-md w-full shadow-2xl relative film-grain"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -840,13 +840,14 @@ export default function Home() {
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => setEmail(e.target.value.toLowerCase())}
                     placeholder={translations[lang].emailPlaceholder}
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white mb-4"
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white mb-4 relative z-10"
                     required
                     maxLength={254}
                     autoComplete="email"
                     pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
+                    autoFocus
                   />
                   <button
                     type="submit"
