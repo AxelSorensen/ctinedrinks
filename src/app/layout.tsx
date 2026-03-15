@@ -5,10 +5,12 @@ import ClientLayout from "./ClientLayout";
 
 export const metadata: Metadata = {
   title: "Ctine Drinks - Premium Beverages",
-  description: "Discover Ctine Drinks, your source for premium and refreshing beverages. Join our waitlist for exclusive access.",
+  description:
+    "Discover Ctine Drinks, your source for premium and refreshing beverages. Join our waitlist for exclusive access.",
   openGraph: {
     title: "Ctine Drinks - Premium Beverages",
-    description: "Discover Ctine Drinks, your source for premium and refreshing beverages. Join our waitlist for exclusive access.",
+    description:
+      "Discover Ctine Drinks, your source for premium and refreshing beverages. Join our waitlist for exclusive access.",
     url: "https://ctinedrinks.com",
     siteName: "Ctine Drinks",
     images: [
@@ -25,7 +27,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Ctine Drinks - Premium Beverages",
-    description: "Discover Ctine Drinks, your source for premium and refreshing beverages. Join our waitlist for exclusive access.",
+    description:
+      "Discover Ctine Drinks, your source for premium and refreshing beverages. Join our waitlist for exclusive access.",
     images: ["/assets/ctine-og-image.png"],
   },
 };
