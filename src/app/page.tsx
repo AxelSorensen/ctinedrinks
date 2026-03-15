@@ -248,10 +248,20 @@ export default function Home() {
           property="og:description"
           content="Discover CTINE, the world's first sports drink infused with 5 grams of 100% creatine monohydrate. Stay hydrated and energized with zero sugar and essential electrolytes."
         />
-        <meta property="og:image" content="/assets/ctine-logo.png" />
-        <meta property="og:image:alt" content="CTINE Logo" />
+        <meta property="og:image" content="/assets/ctine-og-image.png" />
+        <meta
+          property="og:image:alt"
+          content="CTINE Sports Drink - Revolutionizing Sports Hydration"
+        />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta property="og:url" content="https://www.ctinedrinks.com" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content="/assets/ctine-og-image.png" />
+        <meta
+          name="twitter:image:alt"
+          content="CTINE Sports Drink - Revolutionizing Sports Hydration"
+        />
         <link rel="icon" href="/assets/c-favicon.ico" />{" "}
         {/* Added c-favicon as the browser tab logo */}
       </Head>
