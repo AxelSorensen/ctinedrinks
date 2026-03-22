@@ -4,7 +4,7 @@ import { ModalProvider } from "../context/ModalContext";
 import ClientLayout from "./ClientLayout";
 
 export const metadata: Metadata = {
-  title: "Ctine Drinks - Make Consistency Possible",
+  title: "C-Tine Drinks - Make Consistency Possible",
   description: "Welcome to C-Tine. Funcional drinks at a new pace.",
   openGraph: {
     title: "C-Tine Drinks - Make Consistency Possible",
