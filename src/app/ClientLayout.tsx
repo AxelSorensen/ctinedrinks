@@ -43,35 +43,8 @@ function Header() {
   // Calculate blur amount based on scroll position (max 12px)
   const blurAmount = Math.min(scrollY / 10, 12);
 
-  // Interpolate color from dark (#111) to light (#fff) based on scroll
-  const interpolateColor = (
-    startColor: string,
-    endColor: string,
-    factor: number,
-  ) => {
-    const start = parseInt(startColor.slice(1), 16);
-    const end = parseInt(endColor.slice(1), 16);
-
-    const r1 = (start >> 16) & 0xff;
-    const g1 = (start >> 8) & 0xff;
-    const b1 = start & 0xff;
-
-    const r2 = (end >> 16) & 0xff;
-    const g2 = (end >> 8) & 0xff;
-    const b2 = end & 0xff;
-
-    const r = Math.round(r1 + (r2 - r1) * factor);
-    const g = Math.round(g1 + (g2 - g1) * factor);
-    const b = Math.round(b1 + (b2 - b1) * factor);
-
-    return `rgb(${r}, ${g}, ${b})`;
-  };
-
-  const buttonColor = interpolateColor(
-    "#111",
-    "#e5e5e5",
-    Math.min(scrollY / 100, 1),
-  );
+  // Always use white for top bar text
+  const buttonColor = "#fff";
 
   useEffect(() => {
     if (typeof document !== "undefined") {
@@ -82,7 +55,8 @@ function Header() {
   }, [hasJoined]);
 
   const vh = 800;
-  const joinPassed = scrollY > 0.2 * vh;
+  // Delay join waitlist button turning white to match overlay fade (0.53 * vh)
+  const joinPassed = scrollY > 0.53 * vh;
 
   return (
     <div
@@ -114,7 +88,6 @@ function Header() {
             border: "none",
             borderRadius: "6px",
             padding: "0.5rem 1.25rem",
-
             textDecoration: "none",
             fontSize: "0.85rem",
           }}
@@ -147,7 +120,7 @@ function Header() {
             onClick={() => setShowEmailModal(true)}
             className="cursor-pointer"
             style={{
-              color: joinPassed ? "black" : "black",
+              color: joinPassed ? "black" : buttonColor,
               background: joinPassed ? "white" : "transparent",
               border: "none",
               borderRadius: "9999px",
@@ -159,14 +132,17 @@ function Header() {
             onMouseEnter={(e) => {
               if (joinPassed) {
                 e.currentTarget.style.background = "#e5e5e5";
+                e.currentTarget.style.color = "black";
               } else {
-                e.currentTarget.style.background = "rgba(0,0,0,0.1)";
+                e.currentTarget.style.background = "rgba(255,255,255,0.1)";
+                e.currentTarget.style.color = buttonColor;
               }
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = joinPassed
                 ? "white"
                 : "transparent";
+              e.currentTarget.style.color = joinPassed ? "black" : buttonColor;
             }}
           >
             <span className="block md:hidden">

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import ScrollFrames from "../components/ScrollFrames";
 import { useEffect, useState } from "react";
 import { Inter } from "next/font/google";
 import { useLang } from "../context/LangContext";
@@ -291,62 +292,28 @@ export default function Home() {
         className={`relative ${inter.className}`}
         dir={lang === "ar" ? "rtl" : "ltr"}
       >
-        {/* Fixed Background Images */}
+        {/* Background: Video always playing */}
         <div className="fixed inset-0 z-0 h-screen">
-          {sections.map((section, idx) => {
-            // Last slide gets black background only
-            if (idx === sections.length - 1) {
-              return (
-                <div
-                  key={section.id}
-                  className="absolute inset-0 bg-gray-900 film-grain"
-                  style={{
-                    opacity:
-                      idx === currentSection
-                        ? 1 - progressInSection
-                        : idx === currentSection + 1 &&
-                            idx === sections.length - 1
-                          ? progressInSection
-                          : 0,
-                  }}
-                />
-              );
-            }
-            // Alternate between image 1 and image 2
-            const imgSrc =
-              idx % 2 === 0 ? "/assets/img_1.jpg" : "/assets/img_2.png";
-            return (
-              <div
-                key={section.id}
-                className="absolute inset-0 film-grain"
-                style={{
-                  opacity:
-                    idx === currentSection
-                      ? 1 - progressInSection
-                      : idx === currentSection + 1
-                        ? progressInSection
-                        : 0,
-                }}
-              >
-                <Image
-                  src={imgSrc}
-                  alt={`Background for ${section.id}`}
-                  fill
-                  className={
-                    imgSrc === "/assets/img_1.jpg"
-                      ? "object-cover object-[center_10%]"
-                      : "object-cover scale-110 -scale-x-100 object-center"
-                  }
-                  priority
-                />
-              </div>
-            );
-          })}
-          {/* Dark Overlay for Text Sections */}
-          <div
-            className="absolute inset-0 bg-black pointer-events-none"
-            style={{ opacity: overlayOpacity }}
-          />
+          <div className="absolute inset-0 w-full h-full overflow-hidden">
+            <video
+              className="w-full h-full object-cover object-center brightness-75"
+              src="/ctine-video0001-0396.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              style={{ opacity: 1, background: "black" }}
+            />
+            {/* Overlay for readability, darker on first slide */}
+            {/* Overlay fades from light to dark as you scroll down from the first slide */}
+            {/* Overlay fades to black when join waitlist button turns white */}
+            <div
+              className="absolute inset-0 transition-colors duration-700"
+              style={{
+                backgroundColor: `rgba(0,0,0,${scrollY > 0.53 * 800 ? 0.88 : 0.1 + Math.min(0.78, (scrollY / (0.53 * 800)) * 0.78)})`,
+              }}
+            />
+          </div>
         </div>
 
         {/* Scrollable Content */}
@@ -386,14 +353,11 @@ export default function Home() {
 
                         {section.id === "about" &&
                           section.image === "/assets/bottle.png" && (
-                            <div className="md:hidden relative w-full flex flex-col items-center mb-8">
-                              <Image
-                                src={section.image}
-                                alt="CTINE Bottle"
-                                width={180} // Reduced from 220
-                                height={320} // Reduced from 400
-                                className={`object-contain drop-shadow-lg max-h-120`} // Reduced max-width values
-                              />
+                            <div
+                              className="md:hidden relative w-full flex flex-col items-center mb-8"
+                              style={{ background: "transparent" }}
+                            >
+                              <ScrollFrames />
                             </div>
                           )}
                         {section.id === "about" &&
@@ -539,7 +503,7 @@ export default function Home() {
                         </button>
                       ))}
                   </div>
-                  {/* Middle: Bottle Image + Top/Middle Annotations */}
+                  {/* Middle: ScrollFrames Animation (replaces bottle image) */}
                   <div
                     className={` ${
                       section.id === "about" ? "hidden md:flex" : "flex"
@@ -549,25 +513,33 @@ export default function Home() {
                         : "justify-center items-center"
                     }`}
                   >
-                    <div className="relative w-full max-w-lg md:max-w-sm flex flex-col items-center ">
-                      <img
-                        src={section.image}
-                        alt={
-                          section.id === "sustainability"
-                            ? "ATP Molecule"
-                            : "CTINE Bottle"
-                        }
-                        className={`object-contain drop-shadow-lg w-full ${
-                          section.id === "about"
-                            ? "max-h-150" // Reduced max-width values
-                            : ""
-                        } ${
-                          section.id === "sustainability"
-                            ? "filter brightness-0 invert"
-                            : ""
-                        }`}
-                      />
-                    </div>
+                    {section.id === "about" &&
+                    section.image === "/assets/bottle.png" ? (
+                      <div
+                        className="relative w-full max-w-lg md:max-w-sm flex flex-col items-center"
+                        style={{ background: "transparent" }}
+                      >
+                        <ScrollFrames />
+                      </div>
+                    ) : (
+                      <div className="relative w-full max-w-lg md:max-w-sm flex flex-col items-center">
+                        <img
+                          src={section.image}
+                          alt={
+                            section.id === "sustainability"
+                              ? "ATP Molecule"
+                              : "CTINE Bottle"
+                          }
+                          className={`object-contain drop-shadow-lg w-full ${
+                            section.id === "about" ? "max-h-150" : ""
+                          } ${
+                            section.id === "sustainability"
+                              ? "filter brightness-0 invert"
+                              : ""
+                          }`}
+                        />
+                      </div>
+                    )}
                   </div>
                   {/* Right: Third Column for Last Annotation (only for 'about' section) */}
                   {section.id === "about" &&
