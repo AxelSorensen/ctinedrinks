@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import ScrollFrames from "../components/ScrollFrames";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Inter } from "next/font/google";
 import { useLang } from "../context/LangContext";
 import { translations } from "../lib/translations";
@@ -41,6 +41,7 @@ interface Section {
 }
 
 export default function Home() {
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [scrollY, setScrollY] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isJoined, setIsJoined] = useState(false);
@@ -65,6 +66,33 @@ export default function Home() {
       setAlreadyJoined(true);
       setHasJoined(true);
     }
+  }, []);
+
+  // Ensure video always plays
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const tryPlay = () => {
+      if (video.paused || video.ended) {
+        video.play().catch(() => {});
+      }
+    };
+
+    // Try to play on load
+    video.addEventListener("loadeddata", tryPlay);
+    // Try to play on user interaction (for mobile/browser restrictions)
+    window.addEventListener("click", tryPlay, { once: true });
+    window.addEventListener("touchstart", tryPlay, { once: true });
+
+    // Try to play immediately in case it's already loaded
+    tryPlay();
+
+    return () => {
+      video.removeEventListener("loadeddata", tryPlay);
+      window.removeEventListener("click", tryPlay);
+      window.removeEventListener("touchstart", tryPlay);
+    };
   }, []);
 
   const getButtonPosition = (): "top" | "bottom" => {
@@ -296,6 +324,7 @@ export default function Home() {
         <div className="fixed inset-0 z-0 h-screen">
           <div className="absolute inset-0 w-full h-full overflow-hidden">
             <video
+              ref={videoRef}
               className="w-full h-full object-cover object-center brightness-75"
               src="/ctine-video0001-0396.mp4"
               autoPlay
@@ -733,7 +762,7 @@ export default function Home() {
             onClick={() => setIsModalOpen(false)}
           >
             <div
-              className="bg-black border border-gray-600 rounded-2xl p-8 max-w-md w-full shadow-2xl relative film-grain"
+              className="bg-black border border-gray-600 rounded-2xl p-8 max-w-md w-full shadow-2xl relative"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -797,7 +826,7 @@ export default function Home() {
             onClick={() => setShowEmailModal(false)}
           >
             <div
-              className="bg-black border border-gray-600 rounded-2xl p-8 max-w-md w-full shadow-2xl relative film-grain"
+              className="bg-black border border-gray-600 rounded-2xl p-8 max-w-md w-full shadow-2xl relative"
               onClick={(e) => e.stopPropagation()}
             >
               <button
