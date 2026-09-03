@@ -2,6 +2,8 @@
 
 A landing page for the Ctine Drinks brand with a waitlist signup, built to launch ahead of the product itself.
 
+![Ctine Drinks screenshot](docs/screenshot.png)
+
 ## Features
 
 - 🎬 **Scroll-driven frame animation** — `ScrollFrames` swaps through a sequence of images as the visitor scrolls, giving the page a video-like feel without an actual video file
