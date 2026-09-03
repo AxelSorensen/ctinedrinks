@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🍹 Ctine Drinks
 
-## Getting Started
+A landing page for the Ctine Drinks brand with a waitlist signup, built to launch ahead of the product itself.
 
-First, run the development server:
+## Features
+
+- 🎬 **Scroll-driven frame animation** — `ScrollFrames` swaps through a sequence of images as the visitor scrolls, giving the page a video-like feel without an actual video file
+- ✉️ **Waitlist capture** — an email form writes straight to Firestore via `addEmailToWaitlist`, with a badge component showing signup state
+- 🌐 **Bilingual copy** — `LangContext` and `translations.ts` swap all page text between languages without a page reload
+- 🪟 **Modal system** — a small `ModalContext` provider drives any in-page modal (e.g. confirming a waitlist signup)
+
+## Installation
+
+```bash
+git clone <this repo>
+cd ctinedrinks
+npm install
+```
+
+## Usage
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open [http://localhost:3000](http://localhost:3000). `npm run build` / `npm run start` produce and serve a production build; `npm run lint` runs ESLint.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Built with
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- [Next.js 15](https://nextjs.org/) (App Router, Turbopack)
+- [React 19](https://react.dev/)
+- [Firebase](https://firebase.google.com/) (Firestore for the waitlist)
+- [Tailwind CSS](https://tailwindcss.com/)
 
-## Learn More
+## Status
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+🚧 Single-page marketing site — functional and deployed, but Firebase config is currently hardcoded in `src/app/page.tsx` rather than pulled from environment variables.
