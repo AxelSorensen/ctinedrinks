@@ -34,4 +34,4 @@ Then open [http://localhost:3000](http://localhost:3000). `npm run build` / `npm
 
 ## Status
 
-🚧 Single-page marketing site — functional and deployed, but Firebase config is currently hardcoded in `src/app/page.tsx` rather than pulled from environment variables.
+⚠️ Runs — `pnpm install && npm run build` verified working as of 2026-09-03 (Next.js build completes cleanly, only lint warnings for unused vars and `<img>` usage). Single-page marketing site — functional and deployed, but Firebase config is currently hardcoded in `src/app/page.tsx` rather than pulled from environment variables.
