@@ -1,11 +1,13 @@
-import { db } from "./firebaseConfig";
-import { collection, addDoc } from "firebase/firestore";
-
 export const addEmailToWaitlist = async (
   email: string,
   buttonPosition: "top" | "bottom",
 ): Promise<boolean> => {
   try {
+    // Load Firebase only when someone actually joins
+    const [{ db }, { collection, addDoc }] = await Promise.all([
+      import("./firebaseConfig"),
+      import("firebase/firestore"),
+    ]);
     await addDoc(collection(db, "emails"), {
       email,
       buttonPosition,

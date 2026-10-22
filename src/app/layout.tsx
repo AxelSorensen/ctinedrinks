@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { preload } from "react-dom";
 import { LangProvider } from "../context/LangContext";
 import { ModalProvider } from "../context/ModalContext";
 import ClientLayout from "./ClientLayout";
@@ -35,6 +36,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Logos are above the fold: fetch them in the HTML head, ahead of everything else
+  preload("/assets/ctine-logo.svg", { as: "image", fetchPriority: "high" });
+  preload("/ctine-logo.svg", { as: "image", fetchPriority: "high" });
   return (
     <LangProvider>
       <ClientLayout>{children}</ClientLayout>
