@@ -1,32 +1,27 @@
 "use client";
 
-import Image from "next/image";
-import ScrollFrames from "../components/ScrollFrames";
+import dynamic from "next/dynamic";
 import { useEffect, useState, useRef } from "react";
 import { Inter } from "next/font/google";
 import { useLang } from "../context/LangContext";
 import { translations } from "../lib/translations";
 import { WaitlistBadge } from "../components/WaitlistBadge";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
-import { initializeApp } from "firebase/app";
 import { addEmailToWaitlist } from "../lib/waitlistFunctions";
 import Head from "next/head";
 import { useModal } from "../context/ModalContext";
+import { useLite } from "../context/ReadyContext";
+import CreatineMolecule from "../components/CreatineMolecule";
+import Reveal from "../components/Reveal";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyABwAB6QuG12q3CAfihuiDc29y-IBUHZ_M",
-  authDomain: "ctine-drinks.firebaseapp.com",
-  projectId: "ctine-drinks",
-  storageBucket: "ctine-drinks.firebasestorage.app",
-  messagingSenderId: "151318308173",
-  appId: "1:151318308173:web:9719dbaa398bd33d0a8304",
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// Client-only and code-split: frames are not needed for the first paint
+const ScrollFrames = dynamic(() => import("../components/ScrollFrames"), {
+  ssr: false,
+});
 
 const inter = Inter({
   weight: ["400", "500", "600", "700"], // Include multiple weights
+  subsets: ["latin"],
+  display: "swap",
 });
 
 interface Section {
@@ -39,6 +34,9 @@ interface Section {
   image: string | null;
   height?: string;
 }
+
+// Max wait for the 885 KB video before falling back to the still photo
+const VIDEO_TIMEOUT_MS = 10000;
 
 export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -68,32 +66,71 @@ export default function Home() {
     }
   }, []);
 
-  // Ensure video always plays
+  // Splash screen (ReadyProvider) is up until logos + first frame are loaded
+  const { ready, liteVideo, setLiteVideo, setLiteFrames, minimal, detected } =
+    useLite();
+  // Download the whole video first (nothing else loads meanwhile), then play
+  // from memory. A blob can't stall on the network, and unlike relying on the
+  // browser's own buffering it can't stop part-way on slow connections.
+  const [videoUrl, setVideoUrl] = useState<string | undefined>();
+  const [videoDone, setVideoDone] = useState(false);
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const tryPlay = () => {
-      if (video.paused || video.ended) {
-        video.play().catch(() => {});
-      }
-    };
-
-    // Try to play on load
-    video.addEventListener("loadeddata", tryPlay);
-    // Try to play on user interaction (for mobile/browser restrictions)
-    window.addEventListener("click", tryPlay, { once: true });
-    window.addEventListener("touchstart", tryPlay, { once: true });
-
-    // Try to play immediately in case it's already loaded
-    tryPlay();
-
+    if (!ready) return;
+    if (liteVideo) {
+      // Photo instead of video: nothing more to wait for
+      setVideoDone(true);
+      return;
+    }
+    let url: string | undefined;
+    const ctrl = new AbortController();
+    // Too slow to be worth it: give up on the video and show the photo,
+    // which also means the frame animation would be too slow
+    const tooSlow = setTimeout(() => {
+      ctrl.abort();
+      setLiteVideo(true);
+      setLiteFrames(true);
+    }, VIDEO_TIMEOUT_MS);
+    fetch("/ctine-video.mp4", { signal: ctrl.signal })
+      .then((r) => r.blob())
+      .then((blob) => {
+        clearTimeout(tooSlow);
+        url = URL.createObjectURL(blob);
+        setVideoUrl(url);
+      })
+      .catch(() => {});
     return () => {
-      video.removeEventListener("loadeddata", tryPlay);
-      window.removeEventListener("click", tryPlay);
-      window.removeEventListener("touchstart", tryPlay);
+      clearTimeout(tooSlow);
+      ctrl.abort();
+      if (url) URL.revokeObjectURL(url);
     };
-  }, []);
+  }, [ready, liteVideo, setLiteVideo, setLiteFrames]);
+
+  const startVideo = () => {
+    const v = videoRef.current;
+    if (v) {
+      // React sets `muted` as a property only; Safari needs the attribute for autoplay
+      v.muted = true;
+      v.setAttribute("muted", "");
+      v.play().catch(() => {
+        // Autoplay blocked (e.g. iOS Low Power Mode): retry on first interaction
+        const retry = () => v.play().catch(() => {});
+        ["touchstart", "click", "scroll"].forEach((e) =>
+          window.addEventListener(e, retry, { once: true, passive: true }),
+        );
+      });
+    }
+    setVideoDone(true);
+  };
+
+  // Warm the cache with the static section images once the video is in, so
+  // they are already there when the user starts scrolling
+  useEffect(() => {
+    if (!videoDone) return;
+    ["/assets/cap.webp", "/assets/profile.webp"].forEach((src) => {
+      const img = new window.Image();
+      img.src = src;
+    });
+  }, [videoDone]);
 
   const getButtonPosition = (): "top" | "bottom" => {
     if (typeof window === "undefined") return "bottom";
@@ -196,7 +233,9 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const handleScroll = () => {
+    let raf = 0;
+    const update = () => {
+      raf = 0;
       const currentScrollY = window.scrollY;
       setScrollY(currentScrollY);
 
@@ -205,8 +244,15 @@ export default function Home() {
         scrollHeight > 0 ? (currentScrollY / scrollHeight) * 100 : 0;
       setScrollProgress(progress);
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    // At most one state update per frame so scrolling never blocks the video
+    const handleScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(raf);
+    };
   }, []);
 
   // Calculate opacity based on scroll position
@@ -233,7 +279,7 @@ export default function Home() {
       id: "about",
       title: translations[lang].about.title,
       subtitle: translations[lang].about.subtitle,
-      subtitleSize: "text-xl",
+      subtitleSize: "text-base md:text-lg",
       buttonText: translations[lang].about.buttonText,
       showLogo: false,
       image: "/assets/bottle.png",
@@ -242,34 +288,34 @@ export default function Home() {
       id: "sustainability",
       title: translations[lang].science.title,
       subtitle: translations[lang].science.subtitle,
-      subtitleSize: "text-lg",
+      subtitleSize: "text-base md:text-lg",
       buttonText: translations[lang].science.buttonText,
       showLogo: false,
-      image: "/assets/molecule_creatine.png",
+      image: "molecule", // drawn as inline SVG, no file
     },
     {
       id: "sustainability-2",
       title: translations[lang].why.title,
       subtitle: translations[lang].why.subtitle,
-      subtitleSize: "text-lg",
+      subtitleSize: "text-base md:text-lg",
       buttonText: translations[lang].why.buttonText,
       showLogo: false,
-      image: "/assets/cap.png",
+      image: "/assets/cap.webp",
     },
     {
       id: "sustainability-3",
       title: translations[lang].story.title,
       subtitle: translations[lang].story.subtitle,
-      subtitleSize: "text-base",
+      subtitleSize: "text-base md:text-lg",
       buttonText: translations[lang].story.buttonText,
       showLogo: false,
-      image: "/assets/profile.png",
+      image: "/assets/profile.webp",
     },
     {
       id: "join",
       title: translations[lang].join.title,
       subtitle: translations[lang].join.subtitle,
-      subtitleSize: "text-lg",
+      subtitleSize: "text-base md:text-lg",
       buttonText: translations[lang].join.buttonText,
       showLogo: false,
       image: null,
@@ -325,19 +371,38 @@ export default function Home() {
           <div className="absolute inset-0 w-full h-full overflow-hidden">
             <video
               ref={videoRef}
-              className="w-full h-full object-cover object-center brightness-75"
-              src="/ctine-video0001-0396.mp4"
-              autoPlay
+              className="w-full h-full object-cover object-center"
               loop
               muted
+              autoPlay
               playsInline
-              style={{ opacity: 1, background: "black" }}
-            />
+              // Video waits until the logos + first frame are in, so they get all the bandwidth
+              src={videoUrl}
+              onCanPlay={startVideo}
+              // Own compositor layer; dimming is an overlay below (a CSS filter on
+              // 1080p video is expensive and made playback stutter)
+              style={{
+                opacity: 1,
+                background: "black",
+                transform: "translateZ(0)",
+                willChange: "transform",
+              }}
+            ></video>
+            {liteVideo && !minimal && (
+              <img
+                src="/ctine-still.webp"
+                alt=""
+                aria-hidden
+                fetchPriority="high"
+                className="absolute inset-0 w-full h-full object-cover object-center"
+              />
+            )}
+            <div className="absolute inset-0 bg-black/25" />
             {/* Overlay for readability, darker on first slide */}
             {/* Overlay fades from light to dark as you scroll down from the first slide */}
             {/* Overlay fades to black when join waitlist button turns white */}
             <div
-              className="absolute inset-0 transition-colors duration-700"
+              className="absolute inset-0"
               style={{
                 backgroundColor: `rgba(0,0,0,${scrollY > 0.53 * 800 ? 0.88 : 0.1 + Math.min(0.78, (scrollY / (0.53 * 800)) * 0.78)})`,
               }}
@@ -368,14 +433,14 @@ export default function Home() {
                     className={`text-center ${lang === "ar" ? "md:text-right" : "md:text-left"} text-white max-w-2xl mb-0 md:mb-0 flex flex-col justify-center h-full`}
                   >
                     {section.title && (
-                      <h1 className="text-3xl md:text-5xl font-semibold mb-4 ">
+                      <h1 className="text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05] mb-6">
                         {section.title}
                       </h1>
                     )}
                     {section.subtitle && (
                       <>
                         <div
-                          className={`${section.subtitleSize} mb-6 whitespace-pre-line`}
+                          className={`${section.subtitleSize} mb-8 whitespace-pre-line leading-relaxed font-normal text-white/75 max-w-xl mx-auto md:mx-0`}
                         >
                           {section.subtitle}
                         </div>
@@ -386,7 +451,7 @@ export default function Home() {
                               className="md:hidden relative w-full flex flex-col items-center mb-8"
                               style={{ background: "transparent" }}
                             >
-                              <ScrollFrames />
+                              <ScrollFrames start={videoDone} />
                             </div>
                           )}
                         {section.id === "about" &&
@@ -395,16 +460,16 @@ export default function Home() {
                               <div className="grid mt-8 grid-cols-1 sm:grid-cols-3 w-full items-start justify-center gap-8 mb-8">
                                 <div className="flex flex-col w-full">
                                   <div
-                                    className={`${lang === "ar" ? "text-right" : "text-left"} text-white text-sm font-semibold leading-tight mb-1`}
+                                    className={`${lang === "ar" ? "text-right" : "text-left"} text-white text-sm font-medium tracking-wide leading-tight mb-2`}
                                   >
                                     {
                                       translations[lang].about.features.creatine
                                         .title
                                     }
                                   </div>
-                                  <div className="border-t border-white w-full mb-2" />
+                                  <div className="border-t border-white/20 w-full mb-3" />
                                   <div
-                                    className={`${lang === "ar" ? "text-right" : "text-left"} text-white text-xs font-normal`}
+                                    className={`${lang === "ar" ? "text-right" : "text-left"} text-white/60 text-[13px] leading-relaxed font-normal`}
                                   >
                                     {
                                       translations[lang].about.features.creatine
@@ -414,16 +479,16 @@ export default function Home() {
                                 </div>
                                 <div className="flex flex-col w-full">
                                   <div
-                                    className={`${lang === "ar" ? "text-right" : "text-left"} text-white text-sm font-semibold leading-tight mb-1 lg:whitespace-nowrap`}
+                                    className={`${lang === "ar" ? "text-right" : "text-left"} text-white text-sm font-medium tracking-wide leading-tight mb-2 lg:whitespace-nowrap`}
                                   >
                                     {
                                       translations[lang].about.features
                                         .electrolytes.title
                                     }
                                   </div>
-                                  <div className="border-t border-white w-full mb-2" />
+                                  <div className="border-t border-white/20 w-full mb-3" />
                                   <div
-                                    className={`${lang === "ar" ? "text-right" : "text-left"} text-white text-xs font-normal`}
+                                    className={`${lang === "ar" ? "text-right" : "text-left"} text-white/60 text-[13px] leading-relaxed font-normal`}
                                   >
                                     {
                                       translations[lang].about.features
@@ -433,16 +498,16 @@ export default function Home() {
                                 </div>
                                 <div className="flex flex-col w-full">
                                   <div
-                                    className={`${lang === "ar" ? "text-right" : "text-left"} text-white text-sm font-semibold leading-tight mb-1`}
+                                    className={`${lang === "ar" ? "text-right" : "text-left"} text-white text-sm font-medium tracking-wide leading-tight mb-2`}
                                   >
                                     {
                                       translations[lang].about.features.sugar
                                         .title
                                     }
                                   </div>
-                                  <div className="border-t border-white w-full mb-2" />
+                                  <div className="border-t border-white/20 w-full mb-3" />
                                   <div
-                                    className={`${lang === "ar" ? "text-right" : "text-left"} text-white text-xs font-normal`}
+                                    className={`${lang === "ar" ? "text-right" : "text-left"} text-white/60 text-[13px] leading-relaxed font-normal`}
                                   >
                                     {
                                       translations[lang].about.features.sugar
@@ -465,7 +530,7 @@ export default function Home() {
                           ) : (
                             <button
                               onClick={() => setShowEmailModal(true)}
-                              className="bg-white text-black px-6 py-3 rounded-full text-base font-light cursor-pointer hover:bg-gray-200 transition-colors inline-block"
+                              className="bg-white text-black px-7 py-3 rounded-full text-sm font-medium tracking-wide cursor-pointer hover:bg-gray-200 transition-colors inline-block"
                             >
                               {translations[lang].joinWaitlist}
                             </button>
@@ -548,26 +613,34 @@ export default function Home() {
                         className="relative w-full max-w-lg md:max-w-sm flex flex-col items-center"
                         style={{ background: "transparent" }}
                       >
-                        <ScrollFrames />
+                        <ScrollFrames start={videoDone} />
                       </div>
                     ) : (
-                      <div className="relative w-full max-w-lg md:max-w-sm flex flex-col items-center">
-                        <img
-                          src={section.image}
-                          alt={
-                            section.id === "sustainability"
-                              ? "ATP Molecule"
-                              : "CTINE Bottle"
-                          }
-                          className={`object-contain drop-shadow-lg w-full ${
-                            section.id === "about" ? "max-h-150" : ""
-                          } ${
-                            section.id === "sustainability"
-                              ? "filter brightness-0 invert"
-                              : ""
-                          }`}
-                        />
-                      </div>
+                      <Reveal className="relative w-full max-w-lg md:max-w-sm flex flex-col items-center">
+                        {section.id === "sustainability" ? (
+                          <CreatineMolecule />
+                        ) : (
+                          detected && (
+                            <img
+                              loading="lazy"
+                              decoding="async"
+                              src={section.image}
+                              alt={
+                                section.id === "sustainability"
+                                  ? "ATP Molecule"
+                                  : "CTINE Bottle"
+                              }
+                              className={`object-contain drop-shadow-lg w-full ${
+                                section.id === "about" ? "max-h-150" : ""
+                              } ${
+                                section.id === "sustainability"
+                                  ? "filter brightness-0 invert"
+                                  : ""
+                              }`}
+                            />
+                          )
+                        )}
+                      </Reveal>
                     )}
                   </div>
                   {/* Right: Third Column for Last Annotation (only for 'about' section) */}
@@ -583,6 +656,8 @@ export default function Home() {
                       <img
                         src="/ctine-logo.svg"
                         alt="CTINE Logo"
+                        loading="eager"
+                        fetchPriority="high"
                         className="w-[300px] mb-8"
                       />
 
@@ -602,10 +677,10 @@ export default function Home() {
                   )}
                   {section.title && (
                     <h1
-                      className={`font-light mb-4 ${
+                      className={`tracking-tight leading-[1.05] mb-6 ${
                         section.showLogo
-                          ? "text-5xl md:text-7xl mb-6"
-                          : "text-3xl md:text-5xl"
+                          ? "font-light text-5xl md:text-7xl"
+                          : "font-semibold text-4xl md:text-6xl"
                       }`}
                     >
                       {section.title}
@@ -613,8 +688,8 @@ export default function Home() {
                   )}
                   {section.subtitle && (
                     <p
-                      className={`font-light ${section.subtitleSize} ${
-                        section.showLogo ? "mb-8" : "mb-6"
+                      className={`font-normal leading-relaxed text-white/75 max-w-2xl mx-auto ${section.subtitleSize} ${
+                        section.showLogo ? "mb-8" : "mb-8"
                       }`}
                     >
                       {section.subtitle}

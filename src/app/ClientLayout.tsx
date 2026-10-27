@@ -1,21 +1,29 @@
 "use client";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { LangProvider, useLang } from "../context/LangContext";
 import { ModalProvider, useModal } from "../context/ModalContext";
+import { ReadyProvider } from "../context/ReadyContext";
 import { translations } from "../lib/translations";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Same Inter config as page.tsx so Next serves a single font file
+const inter = Inter({
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// Opens the mail app with a draft the visitor can finish
+const contactMailto = (lang: string) => {
+  const subject = lang === "ar" ? "استفسار عن C-TINE" : "Enquiry about C-TINE";
+  const body =
+    lang === "ar"
+      ? "مرحباً فريق C-TINE،\n\nأنا مهتم بمنتجكم.\n\nشكراً!"
+      : "Hey C-TINE,\n\nI'm interested in your product.\n\nThanks!";
+  return `mailto:hello@ctinedrinks.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+};
 
 function Header() {
   const { lang, setLang } = useLang();
@@ -75,6 +83,9 @@ function Header() {
         <img
           src="/assets/ctine-logo.svg"
           alt="ctine logo"
+          loading="eager"
+          decoding="sync"
+          fetchPriority="high"
           style={{ height: "20px", width: "auto", minHeight: "20px" }}
         />
       </Link>
@@ -94,14 +105,8 @@ function Header() {
         >
           {lang === "en" ? "العربية" : "English"}
         </button>
-        <button
-          type="button"
-          onClick={() => {
-            window.scrollTo({
-              top: document.body.scrollHeight,
-              behavior: "smooth",
-            });
-          }}
+        <a
+          href={contactMailto(lang)}
           className="cursor-pointer"
           style={{
             color: buttonColor,
@@ -114,7 +119,7 @@ function Header() {
           }}
         >
           {translations[lang].contact}
-        </button>
+        </a>
         {showWaitlistButton && (
           <button
             onClick={() => setShowEmailModal(true)}
@@ -168,13 +173,13 @@ export default function ClientLayout({
   return (
     <ModalProvider>
       <html lang={lang}>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
-        >
-          <Header />
-          <div className="px-4" style={{ paddingTop: "72px" }}>
-            {children}
-          </div>
+        <body className={`${inter.className} antialiased overflow-x-hidden`}>
+          <ReadyProvider>
+            <Header />
+            <div className="px-4" style={{ paddingTop: "72px" }}>
+              {children}
+            </div>
+          </ReadyProvider>
         </body>
       </html>
     </ModalProvider>
