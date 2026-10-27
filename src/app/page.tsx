@@ -106,7 +106,19 @@ export default function Home() {
   }, [ready, liteVideo, setLiteVideo, setLiteFrames]);
 
   const startVideo = () => {
-    videoRef.current?.play().catch(() => {});
+    const v = videoRef.current;
+    if (v) {
+      // React sets `muted` as a property only; Safari needs the attribute for autoplay
+      v.muted = true;
+      v.setAttribute("muted", "");
+      v.play().catch(() => {
+        // Autoplay blocked (e.g. iOS Low Power Mode): retry on first interaction
+        const retry = () => v.play().catch(() => {});
+        ["touchstart", "click", "scroll"].forEach((e) =>
+          window.addEventListener(e, retry, { once: true, passive: true }),
+        );
+      });
+    }
     setVideoDone(true);
   };
 
@@ -362,6 +374,7 @@ export default function Home() {
               className="w-full h-full object-cover object-center"
               loop
               muted
+              autoPlay
               playsInline
               // Video waits until the logos + first frame are in, so they get all the bandwidth
               src={videoUrl}
